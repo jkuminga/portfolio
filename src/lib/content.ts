@@ -10,7 +10,7 @@ export type ProjectMeta = {
     period?: string;
     thumbnail?: string;
     tags?: string[];
-    links?: { demo?: string; github?: string };
+    links?: { demo?: string; github?: string; presentation?: string };
 };
 
 export type ProjectDoc = {

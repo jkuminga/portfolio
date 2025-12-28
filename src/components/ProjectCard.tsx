@@ -30,13 +30,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                         {project.title}
                     </h3>
                     {/* Link to detail page using slug */}
-                    <Link
+                    {/* <Link
                         to={`/projects/${project.slug}`}
                         aria-label="View project details"
                         className="text-primary hover:text-blue-600 transition-colors p-1"
                     >
                         <span className="material-symbols-outlined">arrow_outward</span>
-                    </Link>
+                    </Link> */}
                 </div>
                 <p className="text-sm text-[#616f89] dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
                     {project.summary}
