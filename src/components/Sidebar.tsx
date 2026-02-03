@@ -4,15 +4,17 @@ export default function Sidebar() {
     const [activeSection, setActiveSection] = useState("");
 
     useEffect(() => {
-        const sections = ["projects", "stacks", "about", "contact"];
+        const sections = ["projects", "stacks", "blog", "about", "contact"];
 
         const observerOptions = {
+            // ... existing options ...
             root: null,
             rootMargin: "-20% 0px -20% 0px", // 화면 중간쯤 왔을 때 더 민감하게 반응하도록 수정
             threshold: 0.1
         };
 
         const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            // ... existing callback ...
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     setActiveSection(entry.target.id);
@@ -33,6 +35,7 @@ export default function Sidebar() {
     const navItems = [
         { id: "projects", label: "프로젝트" },
         { id: "stacks", label: "기술 스택" },
+        { id: "blog", label: "블로그" },
         { id: "about", label: "소개" },
         { id: "contact", label: "연락처" },
     ];

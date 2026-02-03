@@ -1,10 +1,11 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getProjectBySlug } from "../lib/content";
 import Sidebar from "../components/Sidebar";
 import MarkdownRenderer from "../components/MarkdownRenderer";
 
 export default function ProjectDetail() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const project = id ? getProjectBySlug(id) : null;
 
     if (!project) {
@@ -14,7 +15,12 @@ export default function ProjectDetail() {
                 <main className="flex-1 w-full p-6 lg:p-12 xl:p-20 overflow-y-auto flex items-center justify-center">
                     <div className="text-center">
                         <h1 className="text-3xl font-bold mb-4">프로젝트를 찾을 수 없습니다</h1>
-                        <Link to="/" className="text-primary hover:underline">홈으로 돌아가기</Link>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="text-primary hover:underline cursor-pointer"
+                        >
+                            돌아가기
+                        </button>
                     </div>
                 </main>
             </div>
@@ -44,15 +50,15 @@ export default function ProjectDetail() {
                     <div className="max-w-[900px]">
                         {/* Header */}
                         <div className="mb-12">
-                            <Link
-                                to="/"
-                                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-primary transition-colors mb-8"
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-primary transition-colors mb-8 cursor-pointer"
                             >
                                 <span className="material-symbols-outlined text-lg">
                                     arrow_back
                                 </span>
                                 돌아가기
-                            </Link>
+                            </button>
 
                             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                                 <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight">
