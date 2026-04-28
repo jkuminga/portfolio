@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function Sidebar() {
     const [activeSection, setActiveSection] = useState("");
@@ -43,7 +44,7 @@ export default function Sidebar() {
     return (
         <aside className="w-full lg:w-[40%] xl:w-[35%] lg:h-screen lg:sticky lg:top-0 flex flex-col justify-between p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-[#f0f2f4] dark:border-gray-800 bg-white dark:bg-[#151c2a]">
             <div className="flex flex-col items-start gap-8">
-                <div className="flex items-center gap-3 text-primary">
+                <Link to="/" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
                     <div className="size-10 rounded-full overflow-hidden border-2 border-primary/20 shadow-sm transition-transform hover:scale-105 duration-300">
                         <img
                             src="/assets/logo.jpeg"
@@ -54,7 +55,7 @@ export default function Sidebar() {
                     <span className="font-bold text-xl tracking-tight text-[#111318] dark:text-white">
                         JK
                     </span>
-                </div>
+                </Link>
                 <div className="flex flex-col gap-6 mt-4">
                     <div
                         className="bg-center bg-no-repeat bg-cover rounded-full h-32 w-32 border-4 border-white dark:border-gray-800 shadow-xl"
@@ -69,10 +70,12 @@ export default function Sidebar() {
                             도 현 직
                         </h1>
                         <h2 className="text-xl font-medium text-primary mb-4">
-                            Full Stack Engineer
+                            Backend Developer
                         </h2>
                         <p className="text-base leading-relaxed text-[#616f89] dark:text-gray-400 max-w-md">
-                            웹 경험을 만드는 것을 좋아합니다. 직관적인 인터페이스와 확장 가능한 백엔드 시스템 구축에 집중합니다.
+                            백엔드 개발을 중심으로 다양한 프로젝트를 경험하며
+                            <br />
+                            꾸준히 성장하고 있습니다.
                         </p>
                     </div>
                 </div>
@@ -137,9 +140,12 @@ export default function Sidebar() {
                             Blog
                         </span>
                     </a>
-                    <button className="ml-auto flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold shadow-lg hover:shadow-primary/30 hover:bg-blue-600 transition-all cursor-pointer">
+                    <Link
+                        to="/resume"
+                        className="ml-auto flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold shadow-lg hover:shadow-primary/30 hover:bg-blue-600 transition-all cursor-pointer"
+                    >
                         이력서
-                    </button>
+                    </Link>
                 </div>
             </div>
         </aside>

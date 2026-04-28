@@ -22,11 +22,10 @@ export default function SideProjects() {
                         </Link>
 
                         <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#111318] dark:text-white mb-4">
-                            Side & Research Projects
+                            Side Projects & Practice
                         </h1>
-                        <p className="text-lg text-[#616f89] dark:text-gray-400 max-w-2xl leading-relaxed">
-                            메인 프로젝트 외에 진행했던 다양한 개인 프로젝트와 연구 과제들을 소개합니다.
-                            작은 아이디어를 구체화하거나 새로운 기술을 실험했던 기록들입니다.
+                        <p className="text-lg text-[#61드f89] dark:text-gray-400 max-w-2xl leading-relaxed">
+                            실생활의 불편함을 해결하거나, 새롭게 배운 기술을 직접 적용해보기 위해 진행한 개인 프로젝트들입니다.
                         </p>
                     </div>
 

@@ -29,13 +29,15 @@ export default function ScrollReveal({
             }
         );
 
-        if (ref.current) {
-            observer.observe(ref.current);
+        const element = ref.current;
+
+        if (element) {
+            observer.observe(element);
         }
 
         return () => {
-            if (ref.current) {
-                observer.unobserve(ref.current);
+            if (element) {
+                observer.unobserve(element);
             }
         };
     }, []);
@@ -43,9 +45,9 @@ export default function ScrollReveal({
     return (
         <div
             ref={ref}
-            className={`${width} ${className} transition-all duration-700 ease-out ${isVisible
+            className={`${width} ${className} transition-all duration-500 ease-out ${isVisible
                 ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-12"
+                : "opacity-0 translate-y-4"
                 }`}
             style={{ transitionDelay: `${delay}ms` }}
         >

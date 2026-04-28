@@ -7,7 +7,7 @@ import MarkdownRenderer from "../components/MarkdownRenderer";
 import aboutContent from "../content/about.md?raw";
 import VelogPosts from "../lib/velogReader";
 import ScrollReveal from "../components/ScrollReveal";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 interface Stack {
     name: string;
@@ -74,16 +74,16 @@ export default function Home() {
                                     ))}
                                 </div>
                             </div>
-                            <div className="mt-8 flex justify-center">
+                            {/* <div className="mt-8 flex justify-center">
                                 <Link
                                     to="/side-projects"
                                     className="group flex items-center gap-3 px-8 py-4 bg-white dark:bg-[#151c2a] border border-[#f0f2f4] dark:border-gray-800 rounded-2xl text-[#111318] dark:text-white font-bold hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
                                 >
                                     <span className="material-symbols-outlined text-primary group-hover:rotate-12 transition-transform">Auto_stories</span>
-                                    사이드/연구 프로젝트 더보기
+                                    사이드 프로젝트 더보기
                                     <span className="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </Link>
-                            </div>
+                            </div> */}
                         </section>
                     </ScrollReveal>
 
@@ -105,7 +105,7 @@ export default function Home() {
                                                     <img
                                                         src={stack.icon}
                                                         alt={stack.name}
-                                                        className="w-full h-full object-contain dark:invert-0 grayscale group-hover:grayscale-0 transition-all"
+                                                        className="w-full h-full object-contain dark:invert-0 transition-all"
                                                         onError={(e) => {
                                                             (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="material-symbols-outlined text-gray-400">code</span>';
                                                         }}
@@ -114,7 +114,7 @@ export default function Home() {
                                                 <div>
                                                     <h3 className="font-bold text-[#111318] dark:text-white">{stack.name}</h3>
                                                     <div className="flex gap-1 mt-1">
-                                                        {[1, 2, 3].map((level) => (
+                                                        {[1, 2, 3, 4].map((level) => (
                                                             <div
                                                                 key={level}
                                                                 className={`h-1.5 w-6 rounded-full ${level <= stack.proficiency

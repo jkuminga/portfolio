@@ -8,6 +8,7 @@ export type ProjectMeta = {
     role: string;
     stack: string[];
     period?: string;
+    priority?: number;
     thumbnail?: string;
     tags?: string[];
     links?: { demo?: string; github?: string; presentation?: string };
@@ -48,6 +49,7 @@ function parseProject(path: string, raw: string): ProjectMeta {
         role: String(data.role ?? ""),
         stack: Array.isArray(data.stack) ? data.stack.map(String) : [],
         period: data.period ? String(data.period) : undefined,
+        priority: typeof data.priority === "number" ? data.priority : undefined,
         thumbnail: data.thumbnail ? String(data.thumbnail) : undefined,
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
         links: data.links ?? {},
@@ -56,7 +58,14 @@ function parseProject(path: string, raw: string): ProjectMeta {
 
 export function getAllProjects(type: "main" | "side" = "main"): ProjectMeta[] {
     const files = type === "main" ? mainProjectFiles : sideProjectFiles;
-    return Object.entries(files).map(([path, raw]) => parseProject(path, raw));
+    return Object.entries(files)
+        .map(([path, raw]) => parseProject(path, raw))
+        .sort((left, right) => {
+            const priorityDiff = (left.priority ?? Number.MAX_SAFE_INTEGER) - (right.priority ?? Number.MAX_SAFE_INTEGER);
+            if (priorityDiff !== 0) return priorityDiff;
+
+            return left.title.localeCompare(right.title);
+        });
 }
 
 export function getProjectBySlug(slug: string): ProjectDoc | null {
