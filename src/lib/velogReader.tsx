@@ -9,6 +9,140 @@ interface VelogPost {
 }
 
 const VELOG_RSS_URL = "https://v2.velog.io/rss/@jkuminga";
+const VELOG_CACHE_KEY = "velog-posts-cache";
+const FETCH_TIMEOUT_MS = 7000;
+
+type RssItem = {
+  title: string;
+  link: string;
+  pubDate: string;
+  description: string;
+};
+
+function formatDate(pubDateRaw: string) {
+  const date = new Date(pubDateRaw);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function parsePost(item: RssItem): VelogPost {
+  const imgMatch = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
+  const thumbnail = imgMatch ? imgMatch[1] : undefined;
+  const plainDescription = item.description.replace(/<[^>]*>/g, "").trim();
+
+  return {
+    title: item.title,
+    link: item.link,
+    pubDate: formatDate(item.pubDate),
+    description: `${plainDescription.slice(0, 100)}${plainDescription.length > 100 ? "..." : ""}`,
+    thumbnail,
+  };
+}
+
+function parseRssXml(text: string) {
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, "text/xml");
+
+  if (xml.querySelector("parsererror")) {
+    throw new Error("XML parsing failed");
+  }
+
+  return Array.from(xml.querySelectorAll("item"))
+    .slice(0, 4)
+    .map((item) =>
+      parsePost({
+        title: item.querySelector("title")?.textContent || "",
+        link: item.querySelector("link")?.textContent || "",
+        pubDate: item.querySelector("pubDate")?.textContent || "",
+        description: item.querySelector("description")?.textContent || "",
+      }),
+    );
+}
+
+function readCachedPosts() {
+  try {
+    const cached = localStorage.getItem(VELOG_CACHE_KEY);
+    if (!cached) return [];
+
+    const posts = JSON.parse(cached);
+    return Array.isArray(posts) ? (posts as VelogPost[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function cachePosts(posts: VelogPost[]) {
+  try {
+    localStorage.setItem(VELOG_CACHE_KEY, JSON.stringify(posts));
+  } catch {
+    // Cache is best-effort only.
+  }
+}
+
+async function fetchWithTimeout(url: string) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+    return response;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+async function fetchFromRssXml(url: string) {
+  const response = await fetchWithTimeout(url);
+  return parseRssXml(await response.text());
+}
+
+async function fetchFromRss2Json() {
+  const response = await fetchWithTimeout(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(VELOG_RSS_URL)}`);
+  const data = await response.json();
+
+  if (data.status !== "ok" || !Array.isArray(data.items)) {
+    throw new Error("rss2json parsing failed");
+  }
+
+  return data.items.slice(0, 4).map((item: Record<string, string>) =>
+    parsePost({
+      title: item.title || "",
+      link: item.link || "",
+      pubDate: item.pubDate || "",
+      description: item.description || "",
+    }),
+  );
+}
+
+async function fetchVelogPosts() {
+  const fetchers = [
+    () => fetchFromRssXml(VELOG_RSS_URL),
+    () => fetchFromRssXml(`https://api.allorigins.win/raw?url=${encodeURIComponent(VELOG_RSS_URL)}`),
+    fetchFromRss2Json,
+  ];
+
+  for (const fetcher of fetchers) {
+    try {
+      const posts = await fetcher();
+      if (posts.length > 0) return posts;
+    } catch (error) {
+      console.warn("Velog feed source failed:", error);
+    }
+  }
+
+  throw new Error("All Velog feed sources failed");
+}
 
 export default function VelogPosts() {
   const [posts, setPosts] = useState<VelogPost[]>([]);
@@ -16,60 +150,25 @@ export default function VelogPosts() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const loadPosts = async () => {
       try {
-        // Using allorigins proxy to avoid CORS issues
-        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(VELOG_RSS_URL)}`);
-
-        if (!response.ok) throw new Error("Network response was not ok");
-
-        const text = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(text, "text/xml");
-
-        if (xml.querySelector("parsererror")) {
-          throw new Error("XML parsing failed");
-        }
-        console.log(xml);
-
-        const items = Array.from(xml.querySelectorAll("item")).slice(0, 4);
-
-        const parsedPosts = items.map((item) => {
-          const title = item.querySelector("title")?.textContent || "";
-          const link = item.querySelector("link")?.textContent || "";
-          const pubDateRaw = item.querySelector("pubDate")?.textContent || "";
-          const description = item.querySelector("description")?.textContent || "";
-
-          const date = new Date(pubDateRaw);
-          const formattedDate = date.toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-
-          // Extract first image from description for thumbnail
-          const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
-          const thumbnail = imgMatch ? imgMatch[1] : undefined;
-
-          return {
-            title,
-            link,
-            pubDate: formattedDate,
-            description: description.replace(/<[^>]*>/g, "").slice(0, 100) + "...",
-            thumbnail
-          };
-        });
-
+        const parsedPosts = await fetchVelogPosts();
+        cachePosts(parsedPosts);
         setPosts(parsedPosts);
       } catch (err) {
         console.error("Failed to fetch Velog posts:", err);
-        setError(true);
+        const cachedPosts = readCachedPosts();
+        if (cachedPosts.length > 0) {
+          setPosts(cachedPosts);
+        } else {
+          setError(true);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPosts();
+    loadPosts();
   }, []);
 
   if (loading) {
