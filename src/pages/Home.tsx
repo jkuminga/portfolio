@@ -40,7 +40,7 @@ export default function Home() {
             <Sidebar />
             <main className="flex-1 w-full p-6 lg:p-12 xl:p-20 overflow-y-auto">
                 <div className="max-w-[900px]">
-                    <ScrollReveal>
+                    <ScrollReveal initialVisible>
                         <section id="projects" className="pt-4">
                             <div
                                 className="flex items-center justify-between mb-8"
@@ -88,7 +88,7 @@ export default function Home() {
                     </ScrollReveal>
 
                     {/* Tech Stacks Section */}
-                    <ScrollReveal>
+                    <ScrollReveal initialVisible>
                         <section className="mt-20 pt-12 border-t border-[#f0f2f4] dark:border-gray-800" id="stacks">
                             <h2 className="text-[#111318] dark:text-white text-3xl font-bold tracking-tight mb-10">
                                 Tech Stacks
