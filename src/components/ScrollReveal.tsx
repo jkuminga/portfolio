@@ -5,18 +5,22 @@ interface ScrollRevealProps {
     width?: "w-full" | "w-fit" | string;
     className?: string;
     delay?: number;
+    initialVisible?: boolean;
 }
 
 export default function ScrollReveal({
     children,
     width = "w-full",
     className = "",
-    delay = 0
+    delay = 0,
+    initialVisible = false,
 }: ScrollRevealProps) {
     const ref = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(initialVisible);
 
     useEffect(() => {
+        if (initialVisible) return;
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -40,7 +44,7 @@ export default function ScrollReveal({
                 observer.unobserve(element);
             }
         };
-    }, []);
+    }, [initialVisible]);
 
     return (
         <div
